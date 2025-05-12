@@ -2,6 +2,9 @@
 
 <ul>
 @foreach($tasks as $task)
-    <li>{{ $task->title }}（{{ $task->due_date }}）</li>
+    <li>
+        {{ $task->title }}（{{ $task->due_date }}）
+        <a href="{{ route('tasks.edit', $task->id) }}">[編集]</a>
+    </li>
 @endforeach
 </ul>
