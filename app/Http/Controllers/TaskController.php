@@ -31,4 +31,9 @@ class TaskController extends Controller
         return redirect()->route('tasks.index');
     }
 
+    public function create()
+    {
+        return view('tasks.create');
+    }
+
 }
