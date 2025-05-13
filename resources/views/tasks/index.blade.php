@@ -13,33 +13,44 @@
                     {{ session('message') }}
                 </div>
             @endif
-            
+
             <!-- 遷移ボタン -->
             <div class="mt-4 mb-4 flex justify-start">
                 <a href="{{ route('tasks.create') }}"
-                class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                   class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                     新しいタスクを追加
                 </a>
             </div>
 
-            <div class="bg-white shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <ul class="space-y-4">
+            <div class="bg-white shadow overflow-x-auto sm:rounded-lg">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">タスク名</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">内容</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">締切日</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状態</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
                         @forelse($tasks as $task)
-                            <li class="flex justify-between items-center border-b pb-2">
-                                <div>
-                                    <span class="font-medium">{{ $task->title }}</span>
-                                    <span class="text-sm text-gray-500 ml-2">（{{ $task->due_date }}）</span>
-                                </div>
-
-                                <div class="flex items-center space-x-2">
-                                    <!-- 編集リンク -->
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap max-w-xs truncate">
+                                    {{ $task->title }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap max-w-xs truncate">
+                                    {{ $task->content }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {{ \Carbon\Carbon::parse($task->due_date)->format('Y/m/d H:i') }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {{ $task->status }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap flex space-x-4">
                                     <a href="{{ route('tasks.edit', $task->id) }}"
-                                       class="text-blue-600 hover:underline">
-                                        編集
-                                    </a>
-
-                                    <!-- 削除フォーム -->
+                                       class="text-blue-600 hover:underline">編集</a>
                                     <form action="{{ route('tasks.destroy', $task->id) }}" method="POST"
                                           onsubmit="return confirm('本当に削除しますか？');">
                                         @csrf
@@ -49,14 +60,19 @@
                                             削除
                                         </button>
                                     </form>
-                                </div>
-                            </li>
+                                </td>
+                            </tr>
                         @empty
-                            <li class="text-gray-500">タスクが存在しません。</li>
+                            <tr>
+                                <td colspan="5" class="px-6 py-4 text-gray-500 text-center">
+                                    タスクが存在しません。
+                                </td>
+                            </tr>
                         @endforelse
-                    </ul>
-                </div>
+                    </tbody>
+                </table>
             </div>
+
         </div>
     </div>
 </x-app-layout>
