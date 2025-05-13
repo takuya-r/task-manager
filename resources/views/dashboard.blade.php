@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
+            {{ __('ダッシュボード') }}
         </h2>
     </x-slot>
 
@@ -9,8 +9,21 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    {{ __("You're logged in!") }}
+                    {{ __("このタスク管理ツールでは、タスクの追加・編集・削除が行えます。まずはタスク一覧を確認するか、新しいタスクを追加してみましょう。") }}
                 </div>
+            </div>
+
+            <!-- 遷移ボタン -->
+            <div class="mt-6 flex space-x-4">
+                <a href="{{ route('tasks.index') }}"
+                   class="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-900">
+                    タスク一覧へ
+                </a>
+
+                <a href="{{ route('tasks.create') }}"
+                   class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    新しいタスクを追加
+                </a>
             </div>
         </div>
     </div>
