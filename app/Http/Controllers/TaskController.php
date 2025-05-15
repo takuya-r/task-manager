@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
-use Illuminate\Http\Request;
-use App\Models\User;
+use App\Http\Requests\TaskRequest;
 use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
@@ -18,16 +17,9 @@ class TaskController extends Controller
         return view('tasks.index', compact('tasks'));
     }
 
-    public function store(Request $request)
+    public function store(TaskRequest $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|max:255',
-            'content' => 'nullable',
-            'due_date' => 'required|date',
-            'status' => 'required|string|max:50',
-        ]);
-
-        auth()->user()->tasks()->create($validated);
+        auth()->user()->tasks()->create($request->validated());
 
         return redirect()->route('tasks.index');
     }
@@ -47,20 +39,13 @@ class TaskController extends Controller
         return view('tasks.edit', compact('task'));
     }
 
-    public function update(Request $request, Task $task)
+    public function update(TaskRequest $request, Task $task)
     {
         if ($task->user_id !== Auth::id()) {
             abort(403);
         }
 
-        $validated = $request->validate([
-            'title' => 'required|max:255',
-            'content' => 'nullable',
-            'due_date' => 'required|date',
-            'status' => 'required|string|max:50',
-        ]);
-
-        $task->update($validated);
+        $task->update($request->validated());
 
         return redirect()->route('tasks.index')->with('message', 'タスクを更新しました');
     }
