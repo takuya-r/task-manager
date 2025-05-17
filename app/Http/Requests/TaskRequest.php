@@ -26,6 +26,7 @@ class TaskRequest extends FormRequest
             'content' => 'nullable',
             'due_date' => 'required|date',
             'status' => 'required|string|max:50',
+            'tags' => 'nullable|string',
         ];
     }
 }

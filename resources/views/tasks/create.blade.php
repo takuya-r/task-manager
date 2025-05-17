@@ -51,6 +51,16 @@
                         </select>
                     </div>
 
+                    <!-- タグ -->
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1">
+                            タグ（カンマ区切り）
+                        </label>
+                        <input type="text" name="tags" value="{{ old('tags') }}"
+                               placeholder="例: 勉強, 趣味, 重要"
+                               class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200">
+                    </div>
+
                     <!-- 送信ボタン -->
                     <div>
                         <button type="submit"

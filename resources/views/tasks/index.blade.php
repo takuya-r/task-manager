@@ -9,15 +9,15 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             @if (session('message'))
-            <div class="mb-4 text-green-600 font-semibold">
-                {{ session('message') }}
-            </div>
+                <div class="mb-4 text-green-600 font-semibold">
+                    {{ session('message') }}
+                </div>
             @endif
 
             <!-- 遷移ボタン -->
             <div class="mt-4 mb-4 flex justify-start">
                 <a href="{{ route('tasks.create') }}"
-                    class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                   class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                     新しいタスクを追加
                 </a>
             </div>
@@ -30,40 +30,55 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">タスク名</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">内容</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">締切日</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">タグ</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse($tasks as $task)
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ $task->status }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap max-w-xs truncate">{{ $task->title }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap max-w-xs truncate">
-                                <div class="flex items-center space-x-2">
-                                    <span class="truncate max-w-[200px] inline-block">{{ $task->content }}</span>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ $task->status }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap max-w-xs truncate">{{ $task->title }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap max-w-xs truncate">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="truncate max-w-[200px] inline-block">{{ $task->content }}</span>
+                                        <button
+                                            @click="selectedTask = {{ json_encode([
+                                                        'id' => $task->id,
+                                                        'status' => $task->status,
+                                                        'title' => $task->title,
+                                                        'content' => $task->content,
+                                                        'due_date' => $task->due_date,
+                                                        'tags' => $task->tags->pluck('name')->toArray(), // ← タグ名の配列にする
+                                                    ]) }}; showModal = true"
+                                            class="text-sm text-blue-500 hover:underline">
+                                            詳細
+                                        </button>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ \Carbon\Carbon::parse($task->due_date)->format('Y/m/d H:i') }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if (!empty($task->tags))
+                                        @foreach ($task->tags as $tag)
+                                            <span class="inline-block bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded mr-1">{{ $tag->name }}</span>
+                                        @endforeach
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap flex space-x-4">
+                                    <a href="{{ route('tasks.edit', $task->id) }}" class="text-blue-600 hover:underline">編集</a>
                                     <button
-                                        @click="selectedTask = {{ json_encode($task) }}; showModal = true"
-                                        class="text-sm text-blue-500 hover:underline">
-                                        詳細
+                                        @click="selectedDeleteId = {{ $task->id }}; showDeleteModal = true"
+                                        class="text-red-600 hover:underline">
+                                        削除
                                     </button>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ \Carbon\Carbon::parse($task->due_date)->format('Y/m/d H:i') }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap flex space-x-4">
-                                <a href="{{ route('tasks.edit', $task->id) }}" class="text-blue-600 hover:underline">編集</a>
-                                <button
-                                    @click="selectedDeleteId = {{ $task->id }}; showDeleteModal = true"
-                                    class="text-red-600 hover:underline">
-                                    削除
-                                </button>
-                            </td>
-                        </tr>
+                                </td>
+                            </tr>
                         @empty
-                        <tr>
-                            <td colspan="5" class="px-6 py-4 text-gray-500 text-center">
-                                タスクが存在しません。
-                            </td>
-                        </tr>
+                            <tr>
+                                <td colspan="6" class="px-6 py-4 text-gray-500 text-center">
+                                    タスクが存在しません。
+                                </td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -81,6 +96,14 @@
                                 <span x-text="selectedTask.content" class="block whitespace-pre-wrap break-words"></span>
                             </p>
                             <p><strong>締切日:</strong> <span x-text="selectedTask.due_date"></span></p>
+                            <template x-if="selectedTask.tags && selectedTask.tags.length">
+                                <div>
+                                    <strong>タグ:</strong>
+                                    <template x-for="tag in selectedTask.tags" :key="tag">
+                                        <span class="inline-block bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded mr-1" x-text="tag"></span>
+                                    </template>
+                                </div>
+                            </template>
                         </div>
                     </template>
                     <div class="mt-4 text-right">

@@ -19,8 +19,13 @@ class TaskController extends Controller
 
     public function store(TaskRequest $request)
     {
-        auth()->user()->tasks()->create($request->validated());
+        // 1. バリデーション済みのデータでタスクを作成
+        $task = auth()->user()->tasks()->create($request->validated());
 
+        // 2. タグ入力（コンマ区切り）の処理と中間テーブルへの保存
+        $this->syncTags($task, $request->input('tags'));
+
+        // 3. 一覧ページへリダイレクト
         return redirect()->route('tasks.index');
     }
 
@@ -61,5 +66,22 @@ class TaskController extends Controller
         $task->delete();
 
         return redirect()->route('tasks.index')->with('message', 'タスクを削除しました');
+    }
+
+    private function syncTags(Task $task, string $tagInput): void
+    {
+        if (!$tagInput) return;
+
+        // タグ文字列を分割して整形
+        $tagNames = array_filter(array_map('trim', explode(',', $tagInput)));
+        $tagIds = [];
+
+        foreach ($tagNames as $name) {
+            $tag = \App\Models\Tag::firstOrCreate(['name' => $name]);
+            $tagIds[] = $tag->id;
+        }
+
+        // 多対多リレーションの同期（中間テーブルへの保存）
+        $task->tags()->sync($tagIds);
     }
 }
