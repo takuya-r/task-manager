@@ -1,0 +1,1 @@
+<img src="{{ asset('images/taskify_logo_128px.webp') }}" alt="Taskify" loading="eager" class="{{ $attributes['class'] ?? '' }}" width="128" height="128">
