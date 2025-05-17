@@ -46,11 +46,16 @@ class TaskController extends Controller
 
     public function update(TaskRequest $request, Task $task)
     {
+        // 認可（他人のタスクを編集できないように）
         if ($task->user_id !== Auth::id()) {
             abort(403);
         }
 
+        // タスク情報を更新
         $task->update($request->validated());
+
+        // タグの同期（空文字含めて対応）
+        $this->syncTags($task, $request->input('tags'));
 
         return redirect()->route('tasks.index')->with('message', 'タスクを更新しました');
     }
@@ -70,7 +75,11 @@ class TaskController extends Controller
 
     private function syncTags(Task $task, string $tagInput): void
     {
-        if (!$tagInput) return;
+        if (!$tagInput) {
+            // タグ入力が空 → すべてのタグを解除
+            $task->tags()->detach();
+            return;
+        }
 
         // タグ文字列を分割して整形
         $tagNames = array_filter(array_map('trim', explode(',', $tagInput)));

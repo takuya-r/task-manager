@@ -42,6 +42,16 @@
                                class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200">
                     </div>
 
+                    <!-- タグ -->
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1">
+                            タグ（カンマ区切りで入力）
+                        </label>
+                        <input type="text" name="tags"
+                            value="{{ old('tags', implode(',', $task->tags->pluck('name')->toArray())) }}"
+                            class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200">
+                    </div>
+
                     <!-- 状態 -->
                     <div>
                         <label class="block text-gray-700 font-medium mb-1">
