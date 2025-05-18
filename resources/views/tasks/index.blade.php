@@ -53,7 +53,17 @@
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse($tasks as $task)
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ $task->status }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <form action="{{ route('tasks.updateStatus', $task->id) }}" method="POST">
+                                        @csrf
+                                        @method('PATCH')
+                                        <select name="status" onchange="this.form.submit()" class="border-gray-300 rounded px-2 py-1 text-sm w-20">
+                                            @foreach (['未着手', '進行中', '完了'] as $status)
+                                                <option value="{{ $status }}" {{ $task->status === $status ? 'selected' : '' }}>{{ $status }}</option>
+                                            @endforeach
+                                        </select>
+                                    </form>
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap max-w-xs truncate">{{ $task->title }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap max-w-xs truncate">
                                     <div class="flex items-center space-x-2">
