@@ -3,18 +3,39 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use App\Models\Tag;
 use App\Http\Requests\TaskRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // ログイン中のユーザーに紐づくタスクを取得
-        $tasks = auth()->user()->tasks;
+        // 現在ログインしているユーザーを取得
+        $user = auth()->user();
 
-        // tasks/index.blade.php に tasks を渡して表示
-        return view('tasks.index', compact('tasks'));
+        // リクエストから「tag」というクエリパラメータを取得（例：/tasks?tag=仕事）
+        $tagName = $request->input('tag');
+
+        // ユーザーに紐づくタスクをベースにクエリビルダーを生成（タグ情報も一緒に取得）
+        $query = $user->tasks()->with('tags');
+
+        // タグ名が指定されている場合は、該当タグを持つタスクだけに絞り込む
+        if ($tagName) {
+            $query->whereHas('tags', function ($q) use ($tagName) {
+                $q->where('name', $tagName); // タグの名前が一致するものを絞り込み
+            });
+        }
+
+        // 最終的なタスク一覧を取得
+        $tasks = $query->get();
+
+        // タグ一覧をすべて取得（セレクトボックス用）
+        $allTags = Tag::all();
+
+        // タスク一覧ビューにデータを渡して表示
+        return view('tasks.index', compact('tasks', 'allTags', 'tagName'));
     }
 
     public function store(TaskRequest $request)

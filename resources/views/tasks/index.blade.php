@@ -22,6 +22,22 @@
                 </a>
             </div>
 
+            <!-- タグ検索フォーム -->
+            <div class="mb-4">
+                <form method="GET" action="{{ route('tasks.index') }}" class="flex items-center space-x-2">
+                    <label for="tag" class="text-sm font-medium text-gray-700">タグで絞り込み:</label>
+                    <select name="tag" id="tag" onchange="this.form.submit()"
+                            class="border-gray-300 rounded px-2 py-1 w-48 cursor-pointer">
+                        <option value="">すべて表示</option>
+                        @foreach ($allTags as $tag)
+                            <option value="{{ $tag->name }}" {{ request('tag') === $tag->name ? 'selected' : '' }}>
+                                {{ $tag->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+            </div>
+
             <div class="bg-white shadow overflow-x-auto sm:rounded-lg">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
