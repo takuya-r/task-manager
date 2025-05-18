@@ -38,19 +38,6 @@
                                class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200">
                     </div>
 
-                    <!-- 状態 -->
-                    <div>
-                        <label class="block text-gray-700 font-medium mb-1">
-                            状態
-                        </label>
-                        <select name="status"
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200">
-                            <option value="未着手">未着手</option>
-                            <option value="進行中">進行中</option>
-                            <option value="完了">完了</option>
-                        </select>
-                    </div>
-
                     <!-- タグ -->
                     <div>
                         <label class="block text-gray-700 font-medium mb-1">

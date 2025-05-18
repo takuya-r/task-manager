@@ -40,13 +40,19 @@ class TaskController extends Controller
 
     public function store(TaskRequest $request)
     {
-        // 1. バリデーション済みのデータでタスクを作成
-        $task = auth()->user()->tasks()->create($request->validated());
+        // 1. バリデーション済みのデータを取得
+        $validated = $request->validated();
 
-        // 2. タグ入力（コンマ区切り）の処理と中間テーブルへの保存
+        // 2. ステータスを強制的に「未着手」に設定
+        $validated['status'] = '未着手';
+
+        // 3. タスク作成
+        $task = auth()->user()->tasks()->create($validated);
+
+        // 4. タグ処理（中間テーブルへの保存）
         $this->syncTags($task, $request->input('tags'));
 
-        // 3. 一覧ページへリダイレクト
+        // 5. 一覧へリダイレクト
         return redirect()->route('tasks.index');
     }
 

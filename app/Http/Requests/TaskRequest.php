@@ -21,12 +21,19 @@ class TaskRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        // 共通ルール
+        $rules = [
             'title' => 'required|max:255',
             'content' => 'nullable',
             'due_date' => 'required|date',
-            'status' => 'required|string|max:50',
             'tags' => 'nullable|string',
         ];
+
+        // update のときのみ status をバリデーション対象に追加
+        if ($this->routeIs('tasks.update')) {
+            $rules['status'] = 'required|string|max:50|in:未着手,進行中,完了';
+        }
+
+        return $rules;
     }
 }
