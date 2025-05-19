@@ -59,9 +59,11 @@
                         </label>
                         <select name="status"
                                 class="w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200">
-                            <option value="未着手" {{ $task->status === '未着手' ? 'selected' : '' }}>未着手</option>
-                            <option value="進行中" {{ $task->status === '進行中' ? 'selected' : '' }}>進行中</option>
-                            <option value="完了"   {{ $task->status === '完了' ? 'selected' : '' }}>完了</option>
+                            @foreach(config('constants.task_statuses') as $value)
+                                <option value="{{ $value }}" {{ $task->status === $value ? 'selected' : '' }}>
+                                    {{ $value }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
 

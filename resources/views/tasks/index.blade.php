@@ -58,7 +58,7 @@
                                         @csrf
                                         @method('PATCH')
                                         <select name="status" onchange="this.form.submit()" class="border-gray-300 rounded px-2 py-1 text-sm w-20">
-                                            @foreach (['未着手', '進行中', '完了'] as $status)
+                                            @foreach (config('constants.task_statuses') as $status)
                                                 <option value="{{ $status }}" {{ $task->status === $status ? 'selected' : '' }}>{{ $status }}</option>
                                             @endforeach
                                         </select>
@@ -102,7 +102,7 @@
                         @empty
                             <tr>
                                 <td colspan="6" class="px-6 py-4 text-gray-500 text-center">
-                                    タスクが存在しません。
+                                    {{ __('messages.no_tasks') }}
                                 </td>
                             </tr>
                         @endforelse
@@ -143,7 +143,7 @@
             <!-- 削除モーダル -->
             <div x-show="showDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" x-cloak>
                 <div class="bg-white p-6 rounded shadow-lg max-w-sm w-full">
-                    <h2 class="text-lg font-semibold mb-4">本当に削除しますか？</h2>
+                    <h2 class="text-lg font-semibold mb-4">{{ __('messages.delete_confirm') }}</h2>
                     <div class="flex justify-end gap-4">
                         <button @click="showDeleteModal = false" class="px-4 py-2 bg-gray-300 rounded">キャンセル</button>
                         <form :action="'/tasks/' + selectedDeleteId" method="POST">

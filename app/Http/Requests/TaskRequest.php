@@ -21,10 +21,14 @@ class TaskRequest extends FormRequest
      */
     public function rules(): array
     {
+        // ステータス一覧（'未着手', '進行中', '完了'）を取得
+        $validStatuses = array_values(config('constants.task_statuses'));
+        $statusRule = 'required|string|max:50|in:' . implode(',', $validStatuses);
+
         // status のみを更新する routes に対応
         if ($this->routeIs('tasks.updateStatus')) {
             return [
-                'status' => 'required|string|max:50|in:未着手,進行中,完了',
+                'status' => $statusRule,
             ];
         }
 
@@ -38,7 +42,7 @@ class TaskRequest extends FormRequest
 
         // update のときのみ status をバリデーション対象に追加
         if ($this->routeIs('tasks.update')) {
-            $rules['status'] = 'required|string|max:50|in:未着手,進行中,完了';
+            $rules['status'] = $statusRule;
         }
 
         return $rules;

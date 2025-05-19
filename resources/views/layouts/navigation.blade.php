@@ -46,8 +46,7 @@
 
                         <!-- 見出し -->
                         <div class="px-4 py-2 border-b text-sm text-gray-600">
-                            状態が「完了」以外で、<br>
-                            締め切り日が過ぎているか、3日以内のタスクを表示します。
+                            {!! __('messages.notification_description', ['days' => config('constants.notification_days')]) !!}
                         </div>
 
                         <ul class="p-2 space-y-2 text-sm max-h-64 overflow-y-auto">
@@ -64,7 +63,7 @@
                                 </template>
                             </template>
                             <template x-if="notifications.length === 0">
-                                <li class="text-gray-500">通知はありません</li>
+                                <li class="text-gray-500">{{ __('messages.no_notifications') }}</li>
                             </template>
                         </ul>
                     </div>

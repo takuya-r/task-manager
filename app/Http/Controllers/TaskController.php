@@ -40,11 +40,13 @@ class TaskController extends Controller
 
     public function store(TaskRequest $request)
     {
+        $todoStatus = config('constants.task_statuses.todo');
+
         // 1. バリデーション済みのデータを取得
         $validated = $request->validated();
 
         // 2. ステータスを強制的に「未着手」に設定
-        $validated['status'] = '未着手';
+        $validated['status'] = $todoStatus;
 
         // 3. タスク作成
         $task = auth()->user()->tasks()->create($validated);
@@ -84,7 +86,7 @@ class TaskController extends Controller
         // タグの同期（空文字含めて対応）
         $this->syncTags($task, $request->input('tags'));
 
-        return redirect()->route('tasks.index')->with('message', 'タスクを更新しました');
+        return redirect()->route('tasks.index')->with('message', __('messages.task_updated'));
     }
 
     public function destroy(Task $task)
@@ -97,7 +99,7 @@ class TaskController extends Controller
         // タスクを削除
         $task->delete();
 
-        return redirect()->route('tasks.index')->with('message', 'タスクを削除しました');
+        return redirect()->route('tasks.index')->with('message', __('messages.task_deleted'));
     }
 
     public function updateStatus(TaskRequest $request, Task $task)
@@ -111,7 +113,7 @@ class TaskController extends Controller
         $task->status = $request->input('status');
         $task->save();
 
-        return redirect()->route('tasks.index')->with('message', 'ステータスを更新しました');
+        return redirect()->route('tasks.index')->with('message', __('messages.status_updated'));
     }
 
     private function syncTags(Task $task, string $tagInput): void
