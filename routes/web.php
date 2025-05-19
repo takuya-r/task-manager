@@ -1,9 +1,10 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\TaskController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -27,6 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
     Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
 });
 
 require __DIR__.'/auth.php';
