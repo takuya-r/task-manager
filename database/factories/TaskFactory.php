@@ -20,7 +20,7 @@ class TaskFactory extends Factory
             'title' => $this->faker->sentence(3),
             'content' => $this->faker->paragraph(),
             'due_date' => $this->faker->dateTimeBetween('now', '+1 month'),
-            'status' => $this->faker->randomElement(['未着手', '進行中', '完了']),
+            'status' => $this->faker->randomElement(array_values(config('constants.task_statuses'))),
         ];
     }
 }
