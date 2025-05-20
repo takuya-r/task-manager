@@ -34,10 +34,10 @@ class TaskRequest extends FormRequest
 
         // 共通ルール
         $rules = [
-            'title' => 'required|max:255',
-            'content' => 'nullable',
+            'title' => 'required|max:50',
+            'content' => 'nullable|max:500',
             'due_date' => 'required|date',
-            'tags' => 'nullable|string',
+            'tags' => 'nullable|string|max:50',
         ];
 
         // update のときのみ status をバリデーション対象に追加
