@@ -64,7 +64,7 @@
                                         </select>
                                     </form>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap max-w-xs truncate">{{ $task->title }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap max-w-xs truncate max-w-[150px]">{{ $task->title }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap max-w-xs truncate">
                                     <div class="flex items-center space-x-2">
                                         <span class="truncate max-w-[200px] inline-block">{{ $task->content }}</span>
@@ -83,12 +83,17 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">{{ \Carbon\Carbon::parse($task->due_date)->format('Y/m/d H:i') }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if (!empty($task->tags))
+                                <td class="px-6 py-4 whitespace-nowrap w-64">
+                                    <div class="flex flex-wrap gap-1 max-w-full">
                                         @foreach ($task->tags as $tag)
-                                            <span class="inline-block bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded mr-1">{{ $tag->name }}</span>
+                                            <span
+                                                class="block max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded"
+                                                title="{{ $tag->name }}"
+                                            >
+                                                {{ $tag->name }}
+                                            </span>
                                         @endforeach
-                                    @endif
+                                    </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap flex space-x-4">
                                     <a href="{{ route('tasks.edit', $task->id) }}" class="text-blue-600 hover:underline">編集</a>
