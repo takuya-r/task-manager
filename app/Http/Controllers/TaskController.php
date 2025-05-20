@@ -116,7 +116,7 @@ class TaskController extends Controller
         return redirect()->route('tasks.index')->with('message', __('messages.status_updated'));
     }
 
-    private function syncTags(Task $task, string $tagInput): void
+    private function syncTags(Task $task, ?string $tagInput): void
     {
         if (!$tagInput) {
             // タグ入力が空 → すべてのタグを解除
