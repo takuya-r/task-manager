@@ -64,24 +64,8 @@
                                         </select>
                                     </form>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap max-w-xs truncate max-w-[150px]">{{ $task->title }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap max-w-xs truncate">
-                                    <div class="flex items-center space-x-2">
-                                        <span class="truncate max-w-[200px] inline-block">{{ $task->content }}</span>
-                                        <button
-                                            @click="selectedTask = {{ json_encode([
-                                                        'id' => $task->id,
-                                                        'status' => $task->status,
-                                                        'title' => $task->title,
-                                                        'content' => $task->content,
-                                                        'due_date' => $task->due_date,
-                                                        'tags' => $task->tags->pluck('name')->toArray(), // ← タグ名の配列にする
-                                                    ]) }}; showModal = true"
-                                            class="text-sm text-blue-500 hover:underline">
-                                            詳細
-                                        </button>
-                                    </div>
-                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap truncate max-w-[200px]">{{ $task->title }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap truncate max-w-[200px]">{{ $task->content }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">{{ \Carbon\Carbon::parse($task->due_date)->format('Y/m/d H:i') }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap w-64">
                                     <div class="flex flex-wrap gap-1 max-w-full">
@@ -96,7 +80,19 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap flex space-x-4">
-                                    <a href="{{ route('tasks.edit', $task->id) }}" class="text-blue-600 hover:underline">編集</a>
+                                    <button
+                                        @click="selectedTask = {{ json_encode([
+                                                    'id' => $task->id,
+                                                    'status' => $task->status,
+                                                    'title' => $task->title,
+                                                    'content' => $task->content,
+                                                    'due_date' => $task->due_date,
+                                                    'tags' => $task->tags->pluck('name')->toArray(), // ← タグ名の配列にする
+                                                ]) }}; showModal = true"
+                                        class="text-sm text-blue-500 hover:underline">
+                                        詳細
+                                    </button>
+                                    <a href="{{ route('tasks.edit', $task->id) }}" class="text-green-600 hover:underline">編集</a>
                                     <button
                                         @click="selectedDeleteId = {{ $task->id }}; showDeleteModal = true"
                                         class="text-red-600 hover:underline">
