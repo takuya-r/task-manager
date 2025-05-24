@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    {{ __("このタスク管理ツールでは、タスクの追加・編集・削除が行えます。まずはタスク一覧を確認するか、新しいタスクを追加してみましょう。") }}
+                    {{ __('messages.dashboard_message') }}
                 </div>
             </div>
 
