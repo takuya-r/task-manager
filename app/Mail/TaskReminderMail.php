@@ -13,12 +13,16 @@ class TaskReminderMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public $user;
+    public $tasks;
+
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct($user, $tasks)
     {
-        //
+        $this->user = $user;
+        $this->tasks = $tasks;
     }
 
     /**
@@ -38,6 +42,10 @@ class TaskReminderMail extends Mailable
     {
         return new Content(
             markdown: 'emails.tasks.reminder',
+            with: [
+                'user' => $this->user,
+                'tasks' => $this->tasks,
+            ],
         );
     }
 
