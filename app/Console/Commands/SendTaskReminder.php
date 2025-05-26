@@ -35,8 +35,6 @@ class SendTaskReminder extends Command
 
         foreach ($users as $user) {
             $tasks = Task::where('user_id', $user->id)
-                ->where('is_completed', false)
-                ->whereNotNull('due_date')
                 ->where('status', '!=', $doneStatus) // または `status` が `未完了` など
                 ->whereDate('due_date', '<=', now()->addDays($notificationDays)) // 3日以内 or 過去
                 ->orderBy('due_date', 'asc')
