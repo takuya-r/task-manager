@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\Api\TaskApiController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -29,6 +31,15 @@ Route::middleware('auth')->group(function () {
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
     Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+});
+
+Route::middleware([
+    EnsureFrontendRequestsAreStateful::class,
+    'auth:sanctum',
+    'web',
+])->group(function () {
+    Route::patch('/api/tasks/{task}/status', [TaskApiController::class, 'updateStatus'])
+        ->name('api.tasks.updateStatus');
 });
 
 require __DIR__.'/auth.php';

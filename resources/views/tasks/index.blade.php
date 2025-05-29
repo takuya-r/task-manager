@@ -14,6 +14,8 @@
                 </div>
             @endif
 
+            <div id="status-message" class="mb-4 text-green-600 font-semibold"></div>
+
             <!-- 遷移ボタン -->
             <div class="mt-4 mb-4 flex justify-start">
                 <a href="{{ route('tasks.create') }}"
@@ -54,15 +56,18 @@
                         @forelse($tasks as $task)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <form action="{{ route('tasks.updateStatus', $task->id) }}" method="POST">
-                                        @csrf
-                                        @method('PATCH')
-                                        <select name="status" onchange="this.form.submit()" class="border-gray-300 rounded px-2 py-1 text-sm w-20">
-                                            @foreach (config('constants.task_statuses') as $status)
-                                                <option value="{{ $status }}" {{ $task->status === $status ? 'selected' : '' }}>{{ $status }}</option>
-                                            @endforeach
-                                        </select>
-                                    </form>
+                                    <select 
+                                        name="status" 
+                                        data-task-id="{{ $task->id }}"
+                                        onchange="updateStatus(this)"
+                                        class="border-gray-300 rounded px-2 py-1 text-sm w-20"
+                                    >
+                                        @foreach (config('constants.task_statuses') as $status)
+                                            <option value="{{ $status }}" {{ $task->status === $status ? 'selected' : '' }}>
+                                                {{ $status }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap truncate max-w-[200px]">{{ $task->title }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap truncate max-w-[200px]">{{ $task->content }}</td>
@@ -159,3 +164,32 @@
         </div>
     </div>
 </x-app-layout>
+
+<script>
+function updateStatus(selectElement) {
+    const taskId = selectElement.dataset.taskId;
+    const status = selectElement.value;
+
+    fetch(`/api/tasks/${taskId}/status`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({ status }),
+        credentials: 'same-origin'
+    })
+    .then(res => res.json())
+    .then(data => {
+        const msgDiv = document.getElementById('status-message');
+        msgDiv.textContent = data.message || 'ステータスが更新されました';
+        msgDiv.className = 'mb-4 text-green-600 font-semibold';
+        setTimeout(() => msgDiv.textContent = '', 3000);
+    })
+    .catch(err => {
+        const msgDiv = document.getElementById('status-message');
+        msgDiv.textContent = 'ステータス更新に失敗しました';
+        msgDiv.className = 'mb-4 text-red-600 font-semibold';
+    });
+}
+</script>
