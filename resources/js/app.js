@@ -2,7 +2,9 @@ import './bootstrap';
 
 import Alpine from 'alpinejs';
 import notificationDropdown from './notifications';
+import { updateStatus } from './api/task-status';
 
+window.updateStatus = updateStatus;
 window.Alpine = Alpine;
 
 Alpine.data('notificationDropdown', notificationDropdown);
