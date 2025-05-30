@@ -102,20 +102,6 @@ class TaskController extends Controller
         return redirect()->route('tasks.index')->with('message', __('messages.task_deleted'));
     }
 
-    // public function updateStatus(TaskRequest $request, Task $task)
-    // {
-    //     // 認可チェック（ログインユーザのタスクか）
-    //     if ($task->user_id !== Auth::id()) {
-    //         abort(403);
-    //     }
-
-    //     // status のみ更新
-    //     $task->status = $request->input('status');
-    //     $task->save();
-
-    //     return redirect()->route('tasks.index')->with('message', __('messages.status_updated'));
-    // }
-
     private function syncTags(Task $task, ?string $tagInput): void
     {
         if (!$tagInput) {
