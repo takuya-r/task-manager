@@ -14,6 +14,8 @@
                 </div>
             @endif
 
+            <div id="status-message" class="mb-4 text-green-600 font-semibold"></div>
+
             <!-- 遷移ボタン -->
             <div class="mt-4 mb-4 flex justify-start">
                 <a href="{{ route('tasks.create') }}"
@@ -54,15 +56,18 @@
                         @forelse($tasks as $task)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <form action="{{ route('tasks.updateStatus', $task->id) }}" method="POST">
-                                        @csrf
-                                        @method('PATCH')
-                                        <select name="status" onchange="this.form.submit()" class="border-gray-300 rounded px-2 py-1 text-sm w-20">
-                                            @foreach (config('constants.task_statuses') as $status)
-                                                <option value="{{ $status }}" {{ $task->status === $status ? 'selected' : '' }}>{{ $status }}</option>
-                                            @endforeach
-                                        </select>
-                                    </form>
+                                    <select 
+                                        name="status" 
+                                        data-task-id="{{ $task->id }}"
+                                        onchange="updateStatus(this)"
+                                        class="border-gray-300 rounded px-2 py-1 text-sm w-20"
+                                    >
+                                        @foreach (config('constants.task_statuses') as $status)
+                                            <option value="{{ $status }}" {{ $task->status === $status ? 'selected' : '' }}>
+                                                {{ $status }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap truncate max-w-[200px]">{{ $task->title }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap truncate max-w-[200px]">{{ $task->content }}</td>
