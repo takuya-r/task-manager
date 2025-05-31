@@ -6,6 +6,7 @@ use App\Http\Requests\TaskApiRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Task;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
 class TaskApiController extends Controller
@@ -23,5 +24,17 @@ class TaskApiController extends Controller
             'message' => 'Status updated successfully',
             'task' => $task,
         ]);
+    }
+
+    public function destroy(Task $task): JsonResponse
+    {
+        // 自分のタスクか確認
+        if ($task->user_id !== Auth::id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $task->delete();
+
+        return response()->json(['message' => 'Task deleted successfully']);
     }
 }

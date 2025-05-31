@@ -89,19 +89,6 @@ class TaskController extends Controller
         return redirect()->route('tasks.index')->with('message', __('messages.task_updated'));
     }
 
-    public function destroy(Task $task)
-    {
-        // 自分のタスクのみ削除できる
-        if ($task->user_id !== Auth::id()) {
-            abort(403);
-        }
-
-        // タスクを削除
-        $task->delete();
-
-        return redirect()->route('tasks.index')->with('message', __('messages.task_deleted'));
-    }
-
     private function syncTags(Task $task, ?string $tagInput): void
     {
         if (!$tagInput) {
