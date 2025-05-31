@@ -54,7 +54,7 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse($tasks as $task)
-                            <tr>
+                            <tr id="task-{{ $task->id }}">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <select 
                                         name="status" 
@@ -147,16 +147,16 @@
             </div>
 
             <!-- 削除モーダル -->
-            <div x-show="showDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" x-cloak>
+            <div x-show="showDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" id="deleteModal" x-cloak>
                 <div class="bg-white p-6 rounded shadow-lg max-w-sm w-full">
                     <h2 class="text-lg font-semibold mb-4">{{ __('messages.delete_confirm') }}</h2>
                     <div class="flex justify-end gap-4">
                         <button @click="showDeleteModal = false" class="px-4 py-2 bg-gray-300 rounded">キャンセル</button>
-                        <form :action="'/tasks/' + selectedDeleteId" method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded">削除する</button>
-                        </form>
+                        <button
+                            @click="deleteTask(selectedDeleteId),showDeleteModal = false,selectedDeleteId = null"
+                            class="px-4 py-2 bg-red-500 text-white rounded">
+                            削除する
+                        </button>
                     </div>
                 </div>
             </div>
