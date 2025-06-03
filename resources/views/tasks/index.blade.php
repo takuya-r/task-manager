@@ -202,7 +202,7 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             <select name="status" data-task-id="${task.id}" onchange="updateStatus(this)" class="border-gray-300 rounded px-2 py-1 text-sm w-20">
                                 ${Object.entries(statusList).map(([key, label]) => `
-                                    <option value="${key}" ${task.status === key ? 'selected' : ''}>${label}</option>
+                                    <option value="${label}" ${task.status === label ? 'selected' : ''}>${label}</option>
                                 `).join('')}
                             </select>
                         </td>
