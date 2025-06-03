@@ -40,6 +40,8 @@ Route::middleware([
         ->name('api.tasks.updateStatus');
     Route::delete('/api/tasks/{task}', [TaskApiController::class, 'destroy'])
         ->name('api.tasks.destroy');
+    Route::get('/api/tasks', [TaskApiController::class, 'filterByTag'])
+        ->name('api.tasks');
 });
 
 require __DIR__.'/auth.php';

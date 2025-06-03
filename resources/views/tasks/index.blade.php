@@ -26,18 +26,15 @@
 
             <!-- タグ検索フォーム -->
             <div class="mb-4">
-                <form method="GET" action="{{ route('tasks.index') }}" class="flex items-center space-x-2">
-                    <label for="tag" class="text-sm font-medium text-gray-700">タグで絞り込み:</label>
-                    <select name="tag" id="tag" onchange="this.form.submit()"
-                            class="border-gray-300 rounded px-2 py-1 w-48 cursor-pointer">
-                        <option value="">すべて表示</option>
+                <div class="flex items-center space-x-2">
+                    <label for="tag-select" class="text-sm font-medium text-gray-700">タグで絞り込み:</label>
+                    <select name="tag" id="tag-select" class="border-gray-300 rounded px-2 py-1 w-48 cursor-pointer">
+                        <option value="">すべて</option>
                         @foreach ($allTags as $tag)
-                            <option value="{{ $tag->name }}" {{ request('tag') === $tag->name ? 'selected' : '' }}>
-                                {{ $tag->name }}
-                            </option>
+                            <option value="{{ $tag->id }}">{{ $tag->name }}</option>
                         @endforeach
                     </select>
-                </form>
+                </div>
             </div>
 
             <div class="bg-white shadow overflow-x-auto sm:rounded-lg">
@@ -52,7 +49,7 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody id="task-table-body" class="bg-white divide-y divide-gray-200">
                         @forelse($tasks as $task)
                             <tr id="task-{{ $task->id }}">
                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -163,4 +160,70 @@
 
         </div>
     </div>
+    <div id="status-config" data-statuses='@json(config("constants.task_statuses"))'></div>
 </x-app-layout>
+
+<script>
+    const statusList = JSON.parse(document.getElementById('status-config').dataset.statuses);
+    console.log(statusList);
+
+    document.getElementById('tag-select').addEventListener('change', function () {
+        const selectedTag = this.value;
+
+        fetch(`/api/tasks?tag=${encodeURIComponent(selectedTag)}`, {
+            headers: {
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin'
+        })
+        .then(response => response.json())
+        .then(tasks => {
+            const tbody = document.getElementById('task-table-body');
+            tbody.innerHTML = '';
+
+            if (tasks.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-gray-500 text-center">該当するタスクはありません。</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tasks.forEach(task => {
+                const tagsHtml = task.tags.map(tag => `
+                    <span class="block max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded" title="${tag.name}">
+                        ${tag.name}
+                    </span>
+                `).join('');
+
+                const tr = `
+                    <tr id="task-${task.id}">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <select name="status" data-task-id="${task.id}" onchange="updateStatus(this)" class="border-gray-300 rounded px-2 py-1 text-sm w-20">
+                                ${Object.entries(statusList).map(([key, label]) => `
+                                    <option value="${key}" ${task.status === key ? 'selected' : ''}>${label}</option>
+                                `).join('')}
+                            </select>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap truncate max-w-[200px]">${task.title}</td>
+                        <td class="px-6 py-4 whitespace-nowrap truncate max-w-[200px]">${task.content}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${task.due_date}</td>
+                        <td class="px-6 py-4 whitespace-nowrap w-64">
+                            <div class="flex flex-wrap gap-1 max-w-full">${tagsHtml}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap flex space-x-4">
+                            <button onclick='showTaskDetail(${JSON.stringify(task)})' class="text-sm text-blue-500 hover:underline">詳細</button>
+                            <a href="/tasks/${task.id}/edit" class="text-green-600 hover:underline">編集</a>
+                            <button onclick="confirmDelete(${task.id})" class="text-red-600 hover:underline">削除</button>
+                        </td>
+                    </tr>
+                `;
+                tbody.insertAdjacentHTML('beforeend', tr);
+            });
+        })
+        .catch(error => {
+            console.error('タスク取得エラー:', error);
+        });
+    });
+</script>
