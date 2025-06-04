@@ -82,16 +82,7 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap flex space-x-4">
-                                    <button
-                                        @click="selectedTask = {{ json_encode([
-                                                    'id' => $task->id,
-                                                    'status' => $task->status,
-                                                    'title' => $task->title,
-                                                    'content' => $task->content,
-                                                    'due_date' => $task->due_date,
-                                                    'tags' => $task->tags->pluck('name')->toArray(), // ← タグ名の配列にする
-                                                ]) }}; showModal = true"
-                                        class="text-sm text-blue-500 hover:underline">
+                                    <button onclick="openTaskModal({{ $task->id }})" class="text-sm text-blue-500 hover:underline">
                                         詳細
                                     </button>
                                     <a href="{{ route('tasks.edit', $task->id) }}" class="text-green-600 hover:underline">編集</a>
@@ -114,29 +105,33 @@
             </div>
 
             <!-- 詳細モーダル -->
-            <div x-show="showModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" x-cloak>
+            <div
+                x-show="$store.taskModal.showModal"
+                x-cloak
+                class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+            >
                 <div class="bg-white p-6 rounded shadow-lg max-w-md w-full max-h-[80vh] overflow-y-auto">
                     <h2 class="text-lg font-semibold mb-4">タスク詳細</h2>
-                    <template x-if="selectedTask">
+                    <template x-if="$store.taskModal.selectedTask">
                         <div class="space-y-2 break-words">
-                            <p><strong>状態:</strong> <span x-text="selectedTask.status"></span></p>
-                            <p><strong>タイトル:</strong> <span x-text="selectedTask.title"></span></p>
+                            <p><strong>状態:</strong> <span x-text="$store.taskModal.selectedTask.status"></span></p>
+                            <p><strong>タイトル:</strong> <span x-text="$store.taskModal.selectedTask.title"></span></p>
                             <p><strong>内容:</strong>
-                                <span x-text="selectedTask.content" class="block whitespace-pre-wrap break-words"></span>
+                                <span x-text="$store.taskModal.selectedTask.content" class="block whitespace-pre-wrap break-words"></span>
                             </p>
-                            <p><strong>締切日:</strong> <span x-text="selectedTask.due_date"></span></p>
-                            <template x-if="selectedTask.tags && selectedTask.tags.length">
+                            <p><strong>締切日:</strong> <span x-text="$store.taskModal.selectedTask.due_date"></span></p>
+                            <template x-if="$store.taskModal.selectedTask.tags && $store.taskModal.selectedTask.tags.length">
                                 <div>
                                     <strong>タグ:</strong>
-                                    <template x-for="tag in selectedTask.tags" :key="tag">
-                                        <span class="inline-block bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded mr-1" x-text="tag"></span>
+                                    <template x-for="tag in $store.taskModal.selectedTask.tags" :key="tag.id">
+                                        <span class="inline-block bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded mr-1" x-text="tag.name"></span>
                                     </template>
                                 </div>
                             </template>
                         </div>
                     </template>
                     <div class="mt-4 text-right">
-                        <button @click="showModal = false" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+                        <button @click="$store.taskModal.showModal = false" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
                             閉じる
                         </button>
                     </div>
@@ -164,7 +159,46 @@
 </x-app-layout>
 
 <script>
+    const tasks = @json($tasks);
+    console.log(tasks);
+    const tasksMap = new Map();
+    
+    tasks.forEach(task => {
+        tasksMap.set(task.id, task);
+    });
+    console.log(tasksMap);
+</script>
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.store('taskModal', {
+            selectedTask: null,
+            showModal: false
+        });
+    });
+
+    // const tasksMap = new Map();
+
+    function openTaskModal(taskId) {
+        const task = tasksMap.get(taskId);
+        console.log(tasksMap);
+        console.log(tasksMap.get(taskId));
+        console.log(taskId);
+        console.log(task);
+        if (!task) return;
+        // console.log(selectedTask);
+        window.dispatchEvent(new CustomEvent('open-task', { detail: task }));
+    }
+
+    window.addEventListener('open-task', (event) => {
+        Alpine.store('taskModal').selectedTask = event.detail;
+        Alpine.store('taskModal').showModal = true;
+    });
+</script>
+
+<script>
     const statusList = JSON.parse(document.getElementById('status-config').dataset.statuses);
+    // const tasksMap = new Map();
     console.log(statusList);
 
     document.getElementById('tag-select').addEventListener('change', function () {
@@ -191,6 +225,8 @@
             }
 
             tasks.forEach(task => {
+                tasksMap.set(task.id, task); // 後で参照するために保存
+
                 const tagsHtml = task.tags.map(tag => `
                     <span class="block max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded" title="${tag.name}">
                         ${tag.name}
@@ -213,7 +249,9 @@
                             <div class="flex flex-wrap gap-1 max-w-full">${tagsHtml}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap flex space-x-4">
-                            <button onclick='showTaskDetail(${JSON.stringify(task)})' class="text-sm text-blue-500 hover:underline">詳細</button>
+                            <button class="text-sm text-blue-500 hover:underline" onclick="openTaskModal(${task.id})">
+                                詳細
+                            </button>
                             <a href="/tasks/${task.id}/edit" class="text-green-600 hover:underline">編集</a>
                             <button onclick="confirmDelete(${task.id})" class="text-red-600 hover:underline">削除</button>
                         </td>
@@ -221,6 +259,7 @@
                 `;
                 tbody.insertAdjacentHTML('beforeend', tr);
             });
+
         })
         .catch(error => {
             console.error('タスク取得エラー:', error);
