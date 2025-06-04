@@ -253,7 +253,11 @@
                                 詳細
                             </button>
                             <a href="/tasks/${task.id}/edit" class="text-green-600 hover:underline">編集</a>
-                            <button onclick="confirmDelete(${task.id})" class="text-red-600 hover:underline">削除</button>
+                            <button
+                                @click="selectedDeleteId = ${task.id}; showDeleteModal = true"
+                                class="text-red-600 hover:underline">
+                                削除
+                            </button>
                         </td>
                     </tr>
                 `;
