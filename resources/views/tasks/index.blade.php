@@ -156,6 +156,11 @@
         </div>
     </div>
     <div id="status-config" data-statuses='@json(config("constants.task_statuses"))'></div>
+    @php
+        // messages.php の全内容を取得（配列形式）
+        $messages = __('messages');
+    @endphp
+    <div id="message-config" data-messages='@json($messages)'></div>
 </x-app-layout>
 
 <script>
@@ -172,6 +177,18 @@
             showModal: false
         });
     });
+
+    // メッセージを取得する関数（再利用可能）
+    window.getMessages = function() {
+        const configEl = document.getElementById('message-config');
+        if (!configEl) return {};
+        try {
+            return JSON.parse(configEl.dataset.messages || '{}');
+        } catch (e) {
+            console.error('Failed to parse messages:', e);
+            return {};
+        }
+    }
 
     // タスク詳細モーダルを開く
     function openTaskModal(taskId) {
@@ -202,8 +219,9 @@
     // タスクテーブルを更新する
     function updateTaskTable(tasks) {
         const tbody = document.getElementById('task-table-body');
+        const messages = getMessages();
         tbody.innerHTML = tasks.length === 0
-            ? `<tr><td colspan="6" class="px-6 py-4 text-gray-500 text-center">該当するタスクはありません。</td></tr>`
+            ? `<tr><td colspan="6" class="px-6 py-4 text-gray-500 text-center">${messages.no_matching_tasks}</td></tr>`
             : tasks.map(generateTaskRow).join('');
     }
 

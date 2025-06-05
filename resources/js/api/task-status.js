@@ -11,10 +11,16 @@ export function updateStatus(selectElement) {
         body: JSON.stringify({ status }),
         credentials: 'same-origin'
     })
-    .then(res => res.json())
+    .then(async res => {
+        const data = await res.json(); // 常にJSONパース
+        if (!res.ok) {
+            throw data; // data.message を catch 側で使うためそのまま投げる
+        }
+        return data;
+    })
     .then(data => {
         const msgDiv = document.getElementById('status-message');
-        msgDiv.textContent = data.message || 'ステータスが更新されました';
+        msgDiv.textContent = data.message;
         msgDiv.className = 'mb-4 text-green-600 font-semibold';
         setTimeout(() => msgDiv.textContent = '', 3000);
 
@@ -27,7 +33,7 @@ export function updateStatus(selectElement) {
     })
     .catch(err => {
         const msgDiv = document.getElementById('status-message');
-        msgDiv.textContent = 'ステータス更新に失敗しました';
+        msgDiv.textContent = err.message;
         msgDiv.className = 'mb-4 text-red-600 font-semibold';
     });
 }
