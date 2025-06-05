@@ -12,11 +12,16 @@ class TaskController extends Controller
 {
     public function index()
     {
-        // ログイン中のユーザーに紐づくタスクを取得
-        $tasks = auth()->user()->tasks;
+        // ログイン中のユーザー
+        $user = auth()->user();
 
-        // タグ一覧をすべて取得（セレクトボックス用）
-        $allTags = Tag::all();
+        // ユーザーのタスクを取得
+        $tasks = $user->tasks()->with('tags')->get();
+
+        // ユーザーのタスクに紐づくタグのみ取得
+        $allTags = Tag::whereHas('tasks', function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })->get();
 
         // タスク一覧ビューにデータを渡して表示
         return view('tasks.index', compact('tasks', 'allTags'));
