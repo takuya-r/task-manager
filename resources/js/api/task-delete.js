@@ -7,11 +7,12 @@ export function deleteTask(taskId) {
         },
         credentials: 'same-origin'
     })
-    .then(res => {
+    .then(async res => {
+        const data = await res.json(); // 常にJSONパース
         if (!res.ok) {
-            throw new Error('削除に失敗しました');
+            throw data; // data.message を catch 側で使うためそのまま投げる
         }
-        return res.json();
+        return data;
     })
     .then(data => {
         // タスクDOM要素の削除（ID: task-{taskId}）
@@ -19,13 +20,13 @@ export function deleteTask(taskId) {
         if (el) el.remove();
 
         const msgDiv = document.getElementById('status-message');
-        msgDiv.textContent = data.message || 'タスクを削除しました';
+        msgDiv.textContent = data.message;
         msgDiv.className = 'mb-4 text-green-600 font-semibold';
         setTimeout(() => msgDiv.textContent = '', 3000);
     })
     .catch(err => {
         const msgDiv = document.getElementById('status-message');
-        msgDiv.textContent = '削除に失敗しました';
+        msgDiv.textContent = err.message;
         msgDiv.className = 'mb-4 text-red-600 font-semibold';
     });
 }
