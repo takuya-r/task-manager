@@ -162,8 +162,8 @@
     // 初期データの準備
     const tasks = @json($tasks);
     const statusList = JSON.parse(document.getElementById('status-config').dataset.statuses);
-    const tasksMap = new Map();
-    tasks.forEach(task => tasksMap.set(task.id, task));
+    window.tasksMap = new Map();
+    tasks.forEach(task => window.tasksMap.set(task.id, task));
 
     // Alpine.js 初期化
     document.addEventListener('alpine:init', () => {
@@ -175,7 +175,7 @@
 
     // タスク詳細モーダルを開く
     function openTaskModal(taskId) {
-        const task = tasksMap.get(taskId);
+        const task = window.tasksMap.get(taskId);
         if (!task) return;
         window.dispatchEvent(new CustomEvent('open-task', { detail: task }));
     }
@@ -183,6 +183,7 @@
     // Alpineのストアにデータを渡してモーダル表示
     window.addEventListener('open-task', (event) => {
         const store = Alpine.store('taskModal');
+        store.selectedTask = null;
         store.selectedTask = event.detail;
         store.showModal = true;
     });
@@ -208,7 +209,7 @@
 
     // HTML文字列を生成する
     function generateTaskRow(task) {
-        tasksMap.set(task.id, task);
+        window.tasksMap.set(task.id, task);
         const tagHtml = task.tags.map(tag => `
             <span class="block max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded" title="${tag.name}">
                 ${tag.name}

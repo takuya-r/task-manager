@@ -17,6 +17,13 @@ export function updateStatus(selectElement) {
         msgDiv.textContent = data.message || 'ステータスが更新されました';
         msgDiv.className = 'mb-4 text-green-600 font-semibold';
         setTimeout(() => msgDiv.textContent = '', 3000);
+
+        // tasksMap の該当タスクのステータスを更新
+        const task = window.tasksMap.get(Number(taskId));
+        if (task) {
+            task.status = status;
+            window.tasksMap.set(Number(taskId), task);// 明示的に再セット（オプション）
+        }
     })
     .catch(err => {
         const msgDiv = document.getElementById('status-message');
