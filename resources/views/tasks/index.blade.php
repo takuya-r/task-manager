@@ -159,17 +159,13 @@
 </x-app-layout>
 
 <script>
+    // 初期データの準備
     const tasks = @json($tasks);
-    console.log(tasks);
+    const statusList = JSON.parse(document.getElementById('status-config').dataset.statuses);
     const tasksMap = new Map();
-    
-    tasks.forEach(task => {
-        tasksMap.set(task.id, task);
-    });
-    console.log(tasksMap);
-</script>
+    tasks.forEach(task => tasksMap.set(task.id, task));
 
-<script>
+    // Alpine.js 初期化
     document.addEventListener('alpine:init', () => {
         Alpine.store('taskModal', {
             selectedTask: null,
@@ -177,96 +173,67 @@
         });
     });
 
-    // const tasksMap = new Map();
-
+    // タスク詳細モーダルを開く
     function openTaskModal(taskId) {
         const task = tasksMap.get(taskId);
-        console.log(tasksMap);
-        console.log(tasksMap.get(taskId));
-        console.log(taskId);
-        console.log(task);
         if (!task) return;
-        // console.log(selectedTask);
         window.dispatchEvent(new CustomEvent('open-task', { detail: task }));
     }
 
+    // Alpineのストアにデータを渡してモーダル表示
     window.addEventListener('open-task', (event) => {
-        Alpine.store('taskModal').selectedTask = event.detail;
-        Alpine.store('taskModal').showModal = true;
+        const store = Alpine.store('taskModal');
+        store.selectedTask = event.detail;
+        store.showModal = true;
     });
-</script>
 
-<script>
-    const statusList = JSON.parse(document.getElementById('status-config').dataset.statuses);
-    // const tasksMap = new Map();
-    console.log(statusList);
-
+    // タグによるフィルター処理
     document.getElementById('tag-select').addEventListener('change', function () {
         const selectedTag = this.value;
-
         fetch(`/api/tasks?tag=${encodeURIComponent(selectedTag)}`, {
-            headers: {
-                'Accept': 'application/json'
-            },
+            headers: { 'Accept': 'application/json' },
             credentials: 'same-origin'
         })
         .then(response => response.json())
-        .then(tasks => {
-            const tbody = document.getElementById('task-table-body');
-            tbody.innerHTML = '';
-
-            if (tasks.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="px-6 py-4 text-gray-500 text-center">該当するタスクはありません。</td>
-                    </tr>
-                `;
-                return;
-            }
-
-            tasks.forEach(task => {
-                tasksMap.set(task.id, task); // 後で参照するために保存
-
-                const tagsHtml = task.tags.map(tag => `
-                    <span class="block max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded" title="${tag.name}">
-                        ${tag.name}
-                    </span>
-                `).join('');
-
-                const tr = `
-                    <tr id="task-${task.id}">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <select name="status" data-task-id="${task.id}" onchange="updateStatus(this)" class="border-gray-300 rounded px-2 py-1 text-sm w-20">
-                                ${Object.entries(statusList).map(([key, label]) => `
-                                    <option value="${label}" ${task.status === label ? 'selected' : ''}>${label}</option>
-                                `).join('')}
-                            </select>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap truncate max-w-[200px]">${task.title}</td>
-                        <td class="px-6 py-4 whitespace-nowrap truncate max-w-[200px]">${task.content}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">${task.due_date}</td>
-                        <td class="px-6 py-4 whitespace-nowrap w-64">
-                            <div class="flex flex-wrap gap-1 max-w-full">${tagsHtml}</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap flex space-x-4">
-                            <button class="text-sm text-blue-500 hover:underline" onclick="openTaskModal(${task.id})">
-                                詳細
-                            </button>
-                            <a href="/tasks/${task.id}/edit" class="text-green-600 hover:underline">編集</a>
-                            <button
-                                @click="selectedDeleteId = ${task.id}; showDeleteModal = true"
-                                class="text-red-600 hover:underline">
-                                削除
-                            </button>
-                        </td>
-                    </tr>
-                `;
-                tbody.insertAdjacentHTML('beforeend', tr);
-            });
-
-        })
-        .catch(error => {
-            console.error('タスク取得エラー:', error);
-        });
+        .then(updateTaskTable);
     });
+
+    // タスクテーブルを更新する
+    function updateTaskTable(tasks) {
+        const tbody = document.getElementById('task-table-body');
+        tbody.innerHTML = tasks.length === 0
+            ? `<tr><td colspan="6" class="px-6 py-4 text-gray-500 text-center">該当するタスクはありません。</td></tr>`
+            : tasks.map(generateTaskRow).join('');
+    }
+
+    // HTML文字列を生成する
+    function generateTaskRow(task) {
+        tasksMap.set(task.id, task);
+        const tagHtml = task.tags.map(tag => `
+            <span class="block max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded" title="${tag.name}">
+                ${tag.name}
+            </span>
+        `).join('');
+
+        return `
+            <tr id="task-${task.id}">
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <select name="status" data-task-id="${task.id}" onchange="updateStatus(this)" class="border-gray-300 rounded px-2 py-1 text-sm w-20">
+                        ${Object.entries(statusList).map(([key, label]) => `
+                            <option value="${label}" ${task.status === label ? 'selected' : ''}>${label}</option>
+                        `).join('')}
+                    </select>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap truncate max-w-[200px]">${task.title}</td>
+                <td class="px-6 py-4 whitespace-nowrap truncate max-w-[200px]">${task.content}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${task.due_date}</td>
+                <td class="px-6 py-4 whitespace-nowrap w-64"><div class="flex flex-wrap gap-1 max-w-full">${tagHtml}</div></td>
+                <td class="px-6 py-4 whitespace-nowrap flex space-x-4">
+                    <button onclick="openTaskModal(${task.id})" class="text-sm text-blue-500 hover:underline">詳細</button>
+                    <a href="/tasks/${task.id}/edit" class="text-green-600 hover:underline">編集</a>
+                    <button @click="selectedDeleteId = ${task.id}; showDeleteModal = true" class="text-red-600 hover:underline">削除</button>
+                </td>
+            </tr>
+        `;
+    }
 </script>
