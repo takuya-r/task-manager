@@ -9,12 +9,25 @@ use function Pest\Laravel\patch;
 use function Pest\Laravel\delete;
 use function Pest\Laravel\actingAs;
 
+// ==============================
+// トップページの挙動確認
+// ==============================
+
 test('トップページ：未ログイン時に welcome-custom bladeが表示されること', function () {
     $response = $this->get('/');
-
     $response->assertStatus(200);
     $response->assertSee('welcome_custom');
 });
+
+test('トップページ：ログイン時は /dashboard にリダイレクトされること', function () {
+    $user = User::factory()->create();
+    $response = $this->actingAs($user)->get('/');
+    $response->assertRedirect('/dashboard');
+});
+
+// ==============================
+// 未ログイン時のアクセス制限
+// ==============================
 
 test('未ログイン状態で保護されたページにアクセスすると /login にリダイレクトされること', function () {
     $protectedUris = [
@@ -52,11 +65,11 @@ test('未ログイン状態でPOST系リクエストを送信すると /login �
         $uri = $action['uri'];
 
         $response = match ($method) {
-            'post' => post($uri),
-            'put' => put($uri),
-            'patch' => patch($uri),
+            'post'   => post($uri),
+            'put'    => put($uri),
+            'patch'  => patch($uri),
             'delete' => delete($uri),
-            default => throw new Exception("未対応のHTTPメソッド: {$method}"),
+            default  => throw new Exception("未対応のHTTPメソッド: {$method}"),
         };
 
         $actualStatus = $response->status();
@@ -71,19 +84,15 @@ test('未ログイン状態でPOST系リクエストを送信すると /login �
     }
 });
 
-test('トップページ：ログイン時は /dashboard にリダイレクトされること', function () {
-    $user = User::factory()->create();
-
-    $response = $this->actingAs($user)->get('/');
-
-    $response->assertRedirect('/dashboard');
-});
+// ==============================
+// ログイン状態でのページアクセス確認
+// ==============================
 
 test('ログイン時にその他のページへ正常アクセスできること', function () {
     $user = User::factory()->create();
     actingAs($user);
 
-    // テスト用タスクを用意
+    // テスト用タスクを作成
     Task::factory()->count(1)->for($user)->create();
 
     $pages = [
