@@ -52,3 +52,14 @@ test('異常系: 無効なステータス「キャンセル」の場合、バリ
     $response->assertJsonValidationErrors(['status']);
     $this->assertEquals($originalStatus, $this->task->fresh()->status);
 });
+
+test('異常系: 他人のタスクに対してステータス変更しようとすると403エラー', function () {
+    $otherUser = User::factory()->create();
+    $otherTask = Task::factory()->create(['user_id' => $otherUser->id]);
+
+    $response = $this->patchJson("/api/tasks/{$otherTask->id}/status", [
+        'status' => '進行中',
+    ]);
+
+    $response->assertStatus(403); // アクセス拒否を期待
+});

@@ -292,3 +292,16 @@ test('status 異常系', function () {
         'status' => 'キャンセル',
     ])->assertSessionHasErrors(['status' => '選択された状態は、有効ではありません。']);
 });
+
+test('異常系：他人のタスクは更新できず403エラーになる', function () {
+    $otherUser = \App\Models\User::factory()->create();
+    $otherTask = \App\Models\Task::factory()->create(['user_id' => $otherUser->id]);
+
+    put("/tasks/{$otherTask->id}", [
+        'title' => '不正アクセス',
+        'content' => '他人のタスク更新',
+        'due_date' => now()->addDay()->format('Y-m-d H:i'),
+        'tags' => '',
+        'status' => '未着手',
+    ])->assertStatus(403); // ← 403 を期待
+});
