@@ -11,7 +11,7 @@ class TaskApiRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->routeIs('api.tasks.updateStatus');
+        return $this->routeIs('api.tasks.updateStatus') || $this->routeIs('api.tasks');
     }
 
     /**
@@ -21,11 +21,17 @@ class TaskApiRequest extends FormRequest
      */
     public function rules(): array
     {
-        // ステータス一覧（'未着手', '進行中', '完了'）を取得
-        $validStatuses = array_values(config('constants.task_statuses'));
-        $statusRule = 'required|string|max:50|in:' . implode(',', $validStatuses);
+        if($this->routeIs('api.tasks.updateStatus')){
+            // ステータス一覧（'未着手', '進行中', '完了'）を取得
+            $validStatuses = array_values(config('constants.task_statuses'));
+            $statusRule = 'required|string|max:50|in:' . implode(',', $validStatuses);
+            
+            $rules['status'] = $statusRule;
+        }
         
-        $rules['status'] = $statusRule;
+        if($this->routeIs('api.tasks')){
+            $rules['tag'] = 'nullable|integer|exists:tags,id';
+        }
 
         return $rules;
     }
