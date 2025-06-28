@@ -10,22 +10,26 @@ beforeEach(function () {
 });
 
 test('title 正常系', function () {
-    post('/tasks', [
+    $response1 = post('/tasks', [
         'title' => '買い物メモ',
         'content' => '内容',
         'due_date' => now()->addDay()->format('Y-m-d H:i'),
-    ])->assertSessionHasNoErrors();
+    ]);
+    $response1->assertSessionHasNoErrors();
+    $response1->assertRedirect('/tasks');
 
     assertDatabaseHas('tasks', [
         'title' => '買い物メモ',
         'user_id' => $this->user->id,
     ]);
 
-    post('/tasks', [
+    $response2 = post('/tasks', [
         'title' => '😀タスク',
         'content' => '内容',
         'due_date' => now()->addDay()->format('Y-m-d H:i'),
-    ])->assertSessionHasNoErrors();
+    ]);
+    $response2->assertSessionHasNoErrors();
+    $response2->assertRedirect('/tasks');
 
     assertDatabaseHas('tasks', [
         'title' => '😀タスク',
@@ -48,11 +52,13 @@ test('title 異常系', function () {
 });
 
 test('content 正常系', function () {
-    post('/tasks', [
+    $response1 = post('/tasks', [
         'title' => 'テスト1',
         'content' => '飲み物を買う',
         'due_date' => now()->addDay()->format('Y-m-d H:i'),
-    ])->assertSessionHasNoErrors();
+    ]);
+    $response1->assertSessionHasNoErrors();
+    $response1->assertRedirect('/tasks');
 
     assertDatabaseHas('tasks', [
         'title' => 'テスト1',
@@ -60,17 +66,21 @@ test('content 正常系', function () {
         'user_id' => $this->user->id,
     ]);
 
-    post('/tasks', [
+    $response2 = post('/tasks', [
         'title' => 'テスト2',
         'content' => '🍜を買う',
         'due_date' => now()->addDay()->format('Y-m-d H:i'),
-    ])->assertSessionHasNoErrors();
+    ]);
+    $response2->assertSessionHasNoErrors();
+    $response2->assertRedirect('/tasks');
 
-    post('/tasks', [
+    $response3 = post('/tasks', [
         'title' => 'テスト3',
         'content' => '',
         'due_date' => now()->addDay()->format('Y-m-d H:i'),
-    ])->assertSessionHasNoErrors();
+    ]);
+    $response3->assertSessionHasNoErrors();
+    $response3->assertRedirect('/tasks');
 });
 
 test('content 異常系', function () {
@@ -82,11 +92,13 @@ test('content 異常系', function () {
 });
 
 test('due_date 正常系', function () {
-    post('/tasks', [
+    $response = post('/tasks', [
         'title' => 'テスト',
         'content' => '',
         'due_date' => '2025-12-31 12:30',
-    ])->assertSessionHasNoErrors();
+    ]);
+    $response->assertSessionHasNoErrors();
+    $response->assertRedirect('/tasks');
 
     assertDatabaseHas('tasks', [
         'title' => 'テスト',
@@ -110,26 +122,32 @@ test('due_date 異常系', function () {
 });
 
 test('tags 正常系', function () {
-    post('/tasks', [
+    $response1 = post('/tasks', [
         'title' => 'タグ付き1',
         'content' => '',
         'due_date' => now()->addDay()->format('Y-m-d H:i'),
         'tags' => '買い出し,食事',
-    ])->assertSessionHasNoErrors();
+    ]);
+    $response1->assertSessionHasNoErrors();
+    $response1->assertRedirect('/tasks');
 
-    post('/tasks', [
+    $response2 = post('/tasks', [
         'title' => 'タグ付き2',
         'content' => '',
         'due_date' => now()->addDay()->format('Y-m-d H:i'),
         'tags' => '🍜,☕',
-    ])->assertSessionHasNoErrors();
+    ]);
+    $response2->assertSessionHasNoErrors();
+    $response2->assertRedirect('/tasks');
 
-    post('/tasks', [
+    $response3 = post('/tasks', [
         'title' => 'タグなし',
         'content' => '',
         'due_date' => now()->addDay()->format('Y-m-d H:i'),
         'tags' => '',
-    ])->assertSessionHasNoErrors();
+    ]);
+    $response3->assertSessionHasNoErrors();
+    $response3->assertRedirect('/tasks');
 });
 
 test('tags 異常系', function () {

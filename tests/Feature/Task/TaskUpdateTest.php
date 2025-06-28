@@ -20,7 +20,7 @@ test('title 正常系', function () {
         'due_date' => $dueDate,
         'tags' => '日用品',
         'status' => '未着手',
-    ])->assertSessionHasNoErrors();
+    ])->assertSessionHasNoErrors()->assertRedirect('/tasks');
 
     assertDatabaseHas('tasks', [
         'id' => $this->task->id,
@@ -40,7 +40,7 @@ test('title 正常系', function () {
         'due_date' => $dueDate,
         'tags' => '絵文字',
         'status' => '未着手',
-    ])->assertSessionHasNoErrors();
+    ])->assertSessionHasNoErrors()->assertRedirect('/tasks');
 
     assertDatabaseHas('tasks', [
         'id' => $this->task->id,
@@ -82,7 +82,7 @@ test('content 正常系', function () {
         'due_date' => $dueDate,
         'tags' => '',
         'status' => '未着手',
-    ])->assertSessionHasNoErrors();
+    ])->assertSessionHasNoErrors()->assertRedirect('/tasks');
 
     assertDatabaseHas('tasks', [
         'id' => $this->task->id,
@@ -98,7 +98,7 @@ test('content 正常系', function () {
         'due_date' => $dueDate,
         'tags' => '',
         'status' => '未着手',
-    ])->assertSessionHasNoErrors();
+    ])->assertSessionHasNoErrors()->assertRedirect('/tasks');
 
     assertDatabaseHas('tasks', [
         'id' => $this->task->id,
@@ -114,7 +114,7 @@ test('content 正常系', function () {
         'due_date' => $dueDate,
         'tags' => '',
         'status' => '未着手',
-    ])->assertSessionHasNoErrors();
+    ])->assertSessionHasNoErrors()->assertRedirect('/tasks');
 
     assertDatabaseHas('tasks', [
         'id' => $this->task->id,
@@ -142,7 +142,7 @@ test('due_date 正常系', function () {
         'due_date' => '2025-12-31 12:30',
         'tags' => '',
         'status' => '未着手',
-    ])->assertSessionHasNoErrors();
+    ])->assertSessionHasNoErrors()->assertRedirect('/tasks');
 
     assertDatabaseHas('tasks', [
         'id' => $this->task->id,
@@ -180,7 +180,7 @@ test('tags 正常系', function () {
         'due_date' => $dueDate,
         'tags' => '買い出し,食事',
         'status' => '未着手',
-    ])->assertSessionHasNoErrors();
+    ])->assertSessionHasNoErrors()->assertRedirect('/tasks');
 
     assertDatabaseHas('tasks', [
         'id' => $this->task->id,
@@ -201,7 +201,7 @@ test('tags 正常系', function () {
         'due_date' => $dueDate,
         'tags' => '🍜,☕',
         'status' => '未着手',
-    ])->assertSessionHasNoErrors();
+    ])->assertSessionHasNoErrors()->assertRedirect('/tasks');
 
     assertDatabaseHas('tasks', [
         'id' => $this->task->id,
@@ -222,7 +222,7 @@ test('tags 正常系', function () {
         'due_date' => $dueDate,
         'tags' => '',
         'status' => '未着手',
-    ])->assertSessionHasNoErrors();
+    ])->assertSessionHasNoErrors()->assertRedirect('/tasks');
 
     assertDatabaseHas('tasks', [
         'id' => $this->task->id,
@@ -256,7 +256,7 @@ test('status 正常系', function () {
         'due_date' => $dueDate,
         'tags' => '',
         'status' => '未着手',
-    ])->assertSessionHasNoErrors();
+    ])->assertSessionHasNoErrors()->assertRedirect('/tasks');
 
     assertDatabaseHas('tasks', [
         'id' => $this->task->id,
