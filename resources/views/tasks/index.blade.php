@@ -37,71 +37,73 @@
                 </div>
             </div>
 
-            <div class="bg-white shadow overflow-x-auto sm:rounded-lg">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状態</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">タスク名</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">内容</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">締切日</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">タグ</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="task-table-body" class="bg-white divide-y divide-gray-200">
-                        @forelse($tasks as $task)
-                            <tr id="task-{{ $task->id }}">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <select 
-                                        name="status" 
-                                        data-task-id="{{ $task->id }}"
-                                        onchange="updateStatus(this)"
-                                        class="border-gray-300 rounded px-2 py-1 text-sm w-20"
-                                    >
-                                        @foreach (config('constants.task_statuses') as $status)
-                                            <option value="{{ $status }}" {{ $task->status === $status ? 'selected' : '' }}>
-                                                {{ $status }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap truncate max-w-[200px]">{{ $task->title }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap truncate max-w-[200px]">{{ $task->content }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ \Carbon\Carbon::parse($task->due_date)->format('Y/m/d H:i') }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap w-64">
-                                    <div class="flex flex-wrap gap-1 max-w-full">
-                                        @foreach ($task->tags as $tag)
-                                            <span
-                                                class="block max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded"
-                                                title="{{ $tag->name }}"
-                                            >
-                                                {{ $tag->name }}
-                                            </span>
-                                        @endforeach
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap flex space-x-4">
-                                    <button onclick="openTaskModal({{ $task->id }})" class="text-sm text-blue-500 hover:underline">
-                                        詳細
-                                    </button>
-                                    <a href="{{ route('tasks.edit', $task->id) }}" class="text-green-600 hover:underline">編集</a>
-                                    <button
-                                        @click="selectedDeleteId = {{ $task->id }}; showDeleteModal = true"
-                                        class="text-red-600 hover:underline">
-                                        削除
-                                    </button>
-                                </td>
-                            </tr>
-                        @empty
+            <div class="bg-white shadow sm:rounded-lg overflow-x-auto">
+                <div class="overflow-y-auto max-h-[500px]">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50 sticky top-0 z-10">
                             <tr>
-                                <td colspan="6" class="px-6 py-4 text-gray-500 text-center">
-                                    {{ __('messages.no_tasks') }}
-                                </td>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状態</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">タスク名</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">内容</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">締切日</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">タグ</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
                             </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody id="task-table-body" class="bg-white divide-y divide-gray-200">
+                            @forelse($tasks as $task)
+                                <tr id="task-{{ $task->id }}">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <select 
+                                            name="status" 
+                                            data-task-id="{{ $task->id }}"
+                                            onchange="updateStatus(this)"
+                                            class="border-gray-300 rounded px-2 py-1 text-sm w-20"
+                                        >
+                                            @foreach (config('constants.task_statuses') as $status)
+                                                <option value="{{ $status }}" {{ $task->status === $status ? 'selected' : '' }}>
+                                                    {{ $status }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap truncate max-w-[200px]">{{ $task->title }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap truncate max-w-[200px]">{{ $task->content }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">{{ \Carbon\Carbon::parse($task->due_date)->format('Y/m/d H:i') }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap w-64">
+                                        <div class="flex flex-wrap gap-1 max-w-full">
+                                            @foreach ($task->tags as $tag)
+                                                <span
+                                                    class="block max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded"
+                                                    title="{{ $tag->name }}"
+                                                >
+                                                    {{ $tag->name }}
+                                                </span>
+                                            @endforeach
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap flex space-x-4">
+                                        <button onclick="openTaskModal({{ $task->id }})" class="text-sm text-blue-500 hover:underline">
+                                            詳細
+                                        </button>
+                                        <a href="{{ route('tasks.edit', $task->id) }}" class="text-green-600 hover:underline">編集</a>
+                                        <button
+                                            @click="selectedDeleteId = {{ $task->id }}; showDeleteModal = true"
+                                            class="text-red-600 hover:underline">
+                                            削除
+                                        </button>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="px-6 py-4 text-gray-500 text-center">
+                                        {{ __('messages.no_tasks') }}
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- 詳細モーダル -->
