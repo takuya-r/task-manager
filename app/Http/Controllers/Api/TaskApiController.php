@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 
 class TaskApiController extends Controller
 {
-    public function filterByTag(Request $request)
+    public function filterByTag(TaskApiRequest $request)
     {
         $user = auth()->user();
         $tagId = $request->input('tag');

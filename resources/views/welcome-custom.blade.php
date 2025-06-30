@@ -1,5 +1,5 @@
 <x-guest-layout>
-    <div class="text-center space-y-6">
+    <div class="text-center space-y-6" id="welcome_custom">
         <h1 class="text-3xl font-bold text-gray-800">{{ __('messages.welcome_custom_title') }}</h1>
         <p class="text-gray-600">{{ __('messages.welcome_custom_message') }}</p>
 
