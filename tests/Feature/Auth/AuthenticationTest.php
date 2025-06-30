@@ -39,3 +39,22 @@ test('users can logout', function () {
     $this->assertGuest();
     $response->assertRedirect('/');
 });
+
+test('users can authenticate with remember me', function () {
+    $user = \App\Models\User::factory()->create([
+        'password' => bcrypt('password'),
+    ]);
+
+    $response = $this->post('/login', [
+        'email' => $user->email,
+        'password' => 'password',
+        'remember' => 'on',
+    ]);
+
+    $this->assertAuthenticatedAs($user);
+    $response->assertRedirect(route('dashboard', absolute: false));
+
+    // remember_token が更新されていることを確認（Laravelが内部的に生成）
+    $user->refresh();
+    expect($user->getRememberToken())->not->toBeNull();
+});

@@ -2,11 +2,8 @@
 
 namespace Database\Seeders;
 
-//use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-//use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-//use App\Models\Task;
 use App\Models\Tag;
 
 class UsersWithTasksSeeder extends Seeder
@@ -43,7 +40,18 @@ class UsersWithTasksSeeder extends Seeder
                 'status' => config('constants.task_statuses.todo'),
             ]);
 
-            // ランダムで2～4個のタグをタスクに付与
+            $randomTags = $tags->random(rand(2, 4))->pluck('id')->toArray();
+            $task->tags()->attach($randomTags);
+        }
+
+        // 追加タスクを50個作成（ユーザー1）
+        for ($i = 1; $i <= 50; $i++) {
+            $task = $user1->tasks()->create([
+                'title' => "追加タスク{$i}",
+                'content' => "これは追加で作成したタスク{$i}の内容です。",
+                'due_date' => now()->addDays(rand(1, 30)),
+                'status' => config('constants.task_statuses.todo'),
+            ]);
             $randomTags = $tags->random(rand(2, 4))->pluck('id')->toArray();
             $task->tags()->attach($randomTags);
         }
@@ -68,7 +76,18 @@ class UsersWithTasksSeeder extends Seeder
                 'status' => config('constants.task_statuses.todo'),
             ]);
 
-            // ランダムで2～4個のタグをタスクに付与
+            $randomTags = $tags->random(rand(2, 4))->pluck('id')->toArray();
+            $task->tags()->attach($randomTags);
+        }
+
+        // 追加タスクを50個作成（ユーザー2）
+        for ($i = 1; $i <= 50; $i++) {
+            $task = $user2->tasks()->create([
+                'title' => "追加タスク{$i}",
+                'content' => "これは追加で作成したタスク{$i}の内容です。",
+                'due_date' => now()->addDays(rand(1, 30)),
+                'status' => config('constants.task_statuses.todo'),
+            ]);
             $randomTags = $tags->random(rand(2, 4))->pluck('id')->toArray();
             $task->tags()->attach($randomTags);
         }

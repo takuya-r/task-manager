@@ -11,7 +11,7 @@ class TaskRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->routeIs('tasks.store') || $this->routeIs('tasks.update') || $this->routeIs('tasks.updateStatus');
+        return $this->routeIs('tasks.store') || $this->routeIs('tasks.update');
     }
 
     /**
@@ -24,13 +24,6 @@ class TaskRequest extends FormRequest
         // ステータス一覧（'未着手', '進行中', '完了'）を取得
         $validStatuses = array_values(config('constants.task_statuses'));
         $statusRule = 'required|string|max:50|in:' . implode(',', $validStatuses);
-
-        // status のみを更新する routes に対応
-        if ($this->routeIs('tasks.updateStatus')) {
-            return [
-                'status' => $statusRule,
-            ];
-        }
 
         // 共通ルール
         $rules = [
